@@ -1,6 +1,8 @@
-# ED2  Selection With Replacement
-Algoritmo de Classificação de Partição
+# ED2  Partition Merge
 
-make para compilar e criar objeto;
-Primeira entrada = quantidade N de registros a serem gerados;
-Segunda entrada = quantidade de M registros na mem´oria; 
+Intercalação de N partições ordenadas para gerar um único arquivo ordenado
+
+##make para compilar e criar objeto;
+
+##Entrada = quantidade N de registros a serem gerados;
+ 
