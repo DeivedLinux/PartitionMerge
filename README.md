@@ -2,7 +2,7 @@
 
 Intercalação de N partições ordenadas para gerar um único arquivo ordenado
 
-##make para compilar e criar objeto;
+*make para compilar e criar objeto;*
 
-##Entrada = quantidade N de registros a serem gerados;
+*Entrada = quantidade N de registros a serem gerados;*
  
