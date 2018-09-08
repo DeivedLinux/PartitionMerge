@@ -5,6 +5,7 @@
 #include "../include/Ultility.h"
 #include "../include/ArrayList.h"
 #include "../include/Register.h"
+#include "../include/BinaryTree.h"
 
 #define MAX_REGISTERS 1000UL	
 
@@ -165,6 +166,11 @@ int main(int argc, char const *argv[])
 	FILE* file;
 	int nReg,mregisters;
 
+	BinaryTreeWinners tree;
+
+	
+
+	/*
 	unsigned long long sizeReg = sizeof(struct Register);
 
 	scanf("%i",&nReg);
@@ -180,6 +186,7 @@ int main(int argc, char const *argv[])
 	PrintPartitions();
 
 	FileClose(file);
+	*/
 
 
 	return 0;

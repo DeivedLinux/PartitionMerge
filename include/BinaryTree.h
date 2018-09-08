@@ -10,19 +10,13 @@
 #define BINARYTREE_H_
 
 #include "ArrayList.h"
+#include <stdio.h>
+
+typedef void* BinaryTreeWinners;
+typedef unsigned(*FunctionReadFile)(FILE*);
 
 
-typedef struct Node
-{
-	struct Node* father;
-	struct Node* leftSon;
-	struct Node* rightSon;
-	void* info;
-}*Node;
-
-typedef void* BinaryTree;
-
-BinaryTree newBinaryTree(int size);
-ArrayList getNodes(BinaryTree tree);
+BinaryTreeWinners newBinaryTreeWinners(int treeLeaves);
+unsigned buildTreeWinners(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile);
 
 #endif
