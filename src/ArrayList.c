@@ -348,12 +348,18 @@ void insertBottomList(ArrayList list, Object data)
 					newNode->next = NULL;
 					newNode->data = data;
 					newNode->index = CList(list)->size;
-
-					newNode->previous = *GetListEnd(list);
-					newNode->previous->next = newNode;
-					*GetListEnd(list) = newNode;
 					if(*GetListHead(list) == NULL)
+					{
 						*GetListHead(list) = newNode;
+						*GetListEnd(list) = newNode;
+						newNode->previous = NULL;
+					}
+					else
+					{
+						newNode->previous = *GetListEnd(list);
+						newNode->previous->next = newNode;
+						*GetListEnd(list) = newNode;
+					}
 
 					CList(list)->size += 1;
 
@@ -549,7 +555,41 @@ void destroyArrayList(ArrayList list)
 
 unsigned getListSize(ArrayList list)
 {
-	return CList(list)->size;	
+	try
+	{
+		if(list != NULL)
+		{
+			return CList(list)->size;	
+		}
+		else
+		{
+			throw(__NullPointerException__);
+		}
+	}
+	catch(NullPointerException)
+	{
+		PrintExceptionStdOut(NullPointerException);
+	}
+	
+}
+
+unsigned getListLimit(ArrayList list)
+{
+	try
+	{
+		if(list != NULL)
+		{
+			return CList(list)->limit;	
+		}
+		else
+		{
+			throw(__NullPointerException__);
+		}
+	}
+	catch(NullPointerException)
+	{
+		PrintExceptionStdOut(NullPointerException);
+	}
 }
 
 void printList(ArrayList list, PrintFunctionFormat format)

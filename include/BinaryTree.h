@@ -13,10 +13,12 @@
 #include <stdio.h>
 
 typedef void* BinaryTreeWinners;
-typedef unsigned(*FunctionReadFile)(FILE*);
+typedef unsigned(*FunctionReadFile)(FILE* file);
 
 
 BinaryTreeWinners newBinaryTreeWinners(int treeLeaves);
 unsigned buildTreeWinners(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile);
+void MountBTreeWinners(BinaryTreeWinners tree);
+void BinaryTreePreOrdem(BinaryTreeWinners tree);
 
 #endif

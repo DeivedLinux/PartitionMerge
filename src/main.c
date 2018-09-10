@@ -6,6 +6,7 @@
 #include "../include/ArrayList.h"
 #include "../include/Register.h"
 #include "../include/BinaryTree.h"
+#include "../include/Client.h"
 
 #define MAX_REGISTERS 1000UL	
 
@@ -158,7 +159,40 @@ void PrintPartitions(void)
 		FileOpen(partition, bufferStr, "rb");
 		puts(bufferStr);
 		PrintFile(partition);
+		FileClose(partition);
 	}	
+}
+
+static ArrayList GetListGeneratedPartitions(void)
+{
+	FILE* partition = NULL;
+	char bufferStr[64];
+	unsigned i;
+	ArrayList partitionList;
+
+	partitionList = newArrayList(partitionsCounter);
+
+	for(i = 0; i < partitionsCounter; i++)
+	{
+		sprintf(bufferStr,"Partitions/Partition %u.bin",i);
+		FileOpen(partition, bufferStr, "rb");
+		insertBottomList(partitionList, partition);
+	}	
+
+	return partitionList;
+}
+
+static unsigned readFile(FILE* file)
+{
+	struct Client client;
+	struct Register reg;
+	unsigned res;
+
+	FileRead(&client, sizeof(struct Client), 1, file, res);
+
+	reg.rField.bit.key = client.clientCode;
+
+	return reg.rField.bit.key;
 }
 
 int main(int argc, char const *argv[])
@@ -167,10 +201,9 @@ int main(int argc, char const *argv[])
 	int nReg,mregisters;
 
 	BinaryTreeWinners tree;
+	ArrayList partitionList;
 
-	
 
-	/*
 	unsigned long long sizeReg = sizeof(struct Register);
 
 	scanf("%i",&nReg);
@@ -186,7 +219,13 @@ int main(int argc, char const *argv[])
 	PrintPartitions();
 
 	FileClose(file);
-	*/
+	
+	tree = newBinaryTreeWinners(4);
+	partitionList = GetListGeneratedPartitions();
+	buildTreeWinners(tree, partitionList, readFile);
+
+	BinaryTreePreOrdem(tree);
+
 
 
 	return 0;
