@@ -108,7 +108,7 @@ static TreeNode newNodeCreate(void)
 	return node;
 } 
 
-unsigned buildTreeWinners(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile)
+void InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile)
 {
 	TreeNode *leavesVect;
 	TreeNode newNode;
@@ -117,9 +117,13 @@ unsigned buildTreeWinners(BinaryTreeWinners tree, ArrayList listFiles, FunctionR
 	unsigned k,i;
 	unsigned nFiles;
 	unsigned nodes = 0;
+	ArrayList leavesList;
+	FILE* outputFile = NULL;
 
 	nFiles = getListLimit(listFiles);
 	leavesVect = (TreeNode*)calloc(nFiles, sizeof(TreeNode));
+	leavesList = newArrayList(nFiles);
+	FileOpen(outputFile, "OutputFile/output.bin", "w+b");
 
 
 	try
@@ -133,17 +137,14 @@ unsigned buildTreeWinners(BinaryTreeWinners tree, ArrayList listFiles, FunctionR
 				newNode = newNodeCreate();
 				newNode->file = partition;
 				newNode->winner = k;
-				printf("%i ", k);
 				leavesVect[nodes] = newNode;
+				insertBottomList(leavesList, newNode);
 				nodes = nodes + 1;
-				
-
 			}
 			nodes = 0;
 		
 			while(nFiles > 1)
 			{
-				printf("nFiles: %i\n", nFiles);
 				for(i = 0; i < nFiles-1; i += 2)
 				{
 					newNode = newNodeCreate();
@@ -153,13 +154,17 @@ unsigned buildTreeWinners(BinaryTreeWinners tree, ArrayList listFiles, FunctionR
 						newNode->winner = leavesVect[i]->winner;
 						newNode->leftSon = leavesVect[i];
 						newNode->rightSon = leavesVect[i + 1];
+						leavesVect[i]->father = newNode;
+						leavesVect[i + 1]->father = newNode;
 					}
 					else
 					{
 						newNode->file = leavesVect[i + 1]->file;
 						newNode->winner = leavesVect[i + 1]->winner;
 						newNode->leftSon = leavesVect[i];
-						newNode->rightSon = leavesVect[i + 1];	
+						newNode->rightSon = leavesVect[i + 1];
+						leavesVect[i]->father = newNode;
+						leavesVect[i + 1]->father = newNode;	
 					}
 
 					leavesVect[nodes] = newNode;
@@ -176,8 +181,8 @@ unsigned buildTreeWinners(BinaryTreeWinners tree, ArrayList listFiles, FunctionR
 				{	
 					*TreeRoot(tree) = leavesVect[0];
 				}
-	
 			}
+
 			
 		}
 		else
@@ -189,6 +194,8 @@ unsigned buildTreeWinners(BinaryTreeWinners tree, ArrayList listFiles, FunctionR
 	{
 		PrintExceptionStdOut(NullPointerException);
 	}
+
+	free(leavesVect);
 }
 
 static void PreOrder(Root root)
@@ -196,15 +203,16 @@ static void PreOrder(Root root)
 	if(*root != NULL)
 	{
 		printf("%i\n",(*root)->winner);
-		PreOrdem(&((*root)->leftSon));
-		PreOrdem(&((*root)->rightSon));
+		PreOrder(&((*root)->leftSon));
+		PreOrder(&((*root)->rightSon));
 	}
 }
 
 void BinaryTreePreOrder(BinaryTreeWinners tree)
 {
-	PreOrdem(TreeRoot(tree));
+	PreOrder(TreeRoot(tree));
 }
+
 
 
 

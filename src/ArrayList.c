@@ -619,8 +619,58 @@ void printList(ArrayList list, PrintFunctionFormat format)
 bool fullArrayList(ArrayList list)
 {
 	bool full = false;
-
-	full = CList(list)->size == CList(list)->limit?true:false;
-
+	try
+	{
+		if(list != NULL)
+		{
+			full = CList(list)->size == CList(list)->limit?true:false;	
+		}
+		else
+		{
+			throw(__NullPointerException__);
+		}
+	}
+	catch(NullPointerException)
+	{
+		PrintExceptionStdOut(NullPointerException);
+	}
+	
 	return full;
+}
+
+Object* listToVector(ArrayList list)
+{
+	Object* res = NULL;
+	Object aux;
+	unsigned i = 0;
+
+	try
+	{
+		if(list != NULL)
+		{
+			res = (Object)calloc(CList(list)->limit, sizeof(Object));
+			if(res != NULL)
+			{
+				foreach_ArrayList(aux, list)
+				{
+					res[i] = aux;
+					i++;
+				}
+			}
+			else
+			{
+				throw(__MemoryAllocationException__);
+			}
+		}
+		else
+		{
+			throw(__NullPointerException__);
+		}
+	}
+	catch(MemoryAllocationException)
+	{
+		PrintExceptionStdOut(MemoryAllocationException);
+	}
+
+	return res;
 }

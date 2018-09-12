@@ -17,8 +17,10 @@ typedef unsigned(*FunctionReadFile)(FILE* file);
 
 
 BinaryTreeWinners newBinaryTreeWinners(int treeLeaves);
-unsigned buildTreeWinners(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile);
-void MountBTreeWinners(BinaryTreeWinners tree);
-void BinaryTreePreOrdem(BinaryTreeWinners tree);
+void InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile);
+void BinaryTreePreOrder(BinaryTreeWinners tree);
+
+
+
 
 #endif

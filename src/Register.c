@@ -15,7 +15,7 @@ void PrintFile(FILE* file)
 	foreachFile(reg, file)
 	{
 		printf("key: %u\n", reg.rField.bit.key);
-	}
+	}	
 }
 
 void CreateAleatoryRegister(Register outRegister, int n)
@@ -36,8 +36,9 @@ Register newRegister(struct Register res)
 		newReg = calloc(1, sizeof(struct Register));
 		if(newReg != NULL)
 		{
-			newReg->info = res.info;
-			newReg->rField = res.rField;
+			newReg->rField.bit.key = res.rField.bit.key;
+			newReg->rField.bit.freeze = res.rField.bit.freeze;
+			newReg->attached = res.attached;
 		}
 		else
 		{

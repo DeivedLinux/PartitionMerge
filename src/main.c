@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "../include/Exception.h"
 #include "../include/Ultility.h"
 #include "../include/ArrayList.h"
@@ -16,6 +17,13 @@ extern FILE* CreateTestFile(void* tupl);
 extern void PartitionClose(FILE* file);
 static unsigned partitionsCounter = 0;
 static void PrintPartitions(void);
+static unsigned readFile(FILE* file);
+static int compare(Object obj1, Object obj2);
+static bool allFrozen(ArrayList list);
+static void unfreezeRecords(ArrayList list);
+static void SubstitutionSelection(FILE* file, int mregisters);
+static ArrayList GetListGeneratedPartitions(void);
+
 
 static int compare(Object obj1, Object obj2)
 {
@@ -24,11 +32,6 @@ static int compare(Object obj1, Object obj2)
 	res = (((Register)obj1)->rField.bit.key - ((Register)obj2)->rField.bit.key);
 
 	return res;
-}
-
-static void format(Object obj)
-{
-	printf("Key:%i freeze: %i\n",((Register)obj)->rField.bit.key,((Register)obj)->rField.bit.freeze);
 }
 
 static bool allFrozen(ArrayList list)
@@ -79,11 +82,28 @@ Register GetRegisterUnfreeze(ArrayList list)
 	return NULL;
 }
 
-void SubstitutionSelection(FILE* file, int mregisters)
+static void PrintTestFile(FILE* file)
+{
+	struct Client client;
+
+	ReWind(file);
+
+	foreachFile(client, file)
+	{
+		puts("**********************************************");
+		printf("Nome: %s\n",client.name);
+		printf("C´odigo Cliente: %u\n", client.clientCode);
+		printf("Nascimento: %u/%u/%u\n", client.birth.field.day, client.birth.field.month, client.birth.field.year);
+		puts("**********************************************");
+	}
+}
+
+static void SubstitutionSelection(FILE* file, int mregisters)
 {
 	FILE* partition;
 	ArrayList registers;
 	struct Register reg;
+	struct Client client;
 	Register r;
 	bool endFile = false;
 	volatile int resWrite, resRead = MAX_REGISTERS;
@@ -94,8 +114,11 @@ void SubstitutionSelection(FILE* file, int mregisters)
 	partition = PartitionCreate();
 	partitionsCounter += 1;
 
-	foreach_mRegisters(reg, file, mregisters)
-	{
+	foreach_mRegisters(client, file, mregisters)
+	{	
+		reg.rField.bit.key = client.clientCode;
+		reg.attached = malloc(sizeof(struct Client));
+		memcpy(reg.attached, &client, sizeof(struct Client));
 		insertSorted(registers, newRegister(reg), compare);
 	}
 	
@@ -105,24 +128,25 @@ void SubstitutionSelection(FILE* file, int mregisters)
 		r = GetRegisterUnfreeze(registers);
 
 		if(r != NULL)
-		{
-			FileWrite(r, sizeof(struct Register), 1, partition, resWrite);
-			FileRead(&reg, sizeof(struct Register),1, file, resRead);
+		{	
+			client.clientCode = r->rField.bit.key;
+			memcpy(&client, r->attached, sizeof(struct Client));
+			FileWrite(&client, sizeof(struct Client), 1, partition, resWrite);
+			FileRead(&client, sizeof(struct Client),1, file, resRead);
 			if(resRead > 0)
-			{
+			{	
+				reg.rField.bit.key = client.clientCode;
 				if(reg.rField.bit.key < r->rField.bit.key)
 				{
-					reg.rField.bit.freeze = true;
-					r->rField.bit.freeze = reg.rField.bit.freeze;
+					r->rField.bit.freeze = true;
 					r->rField.bit.key = reg.rField.bit.key;
-					r->info = reg.info;
+					memcpy(r->attached, &client, sizeof(struct Client));
 				}
 				else
 				{
-					reg.rField.bit.freeze = false;
-					r->rField.bit.freeze = reg.rField.bit.freeze;
+					r->rField.bit.freeze = false;
 					r->rField.bit.key = reg.rField.bit.key;
-					r->info = reg.info;
+					memcpy(r->attached, &client, sizeof(struct Client));
 				}
 
 				insertSorted(registers, r, compare);
@@ -140,14 +164,15 @@ void SubstitutionSelection(FILE* file, int mregisters)
 			partitionsCounter += 1;
 		}
 	}
-
+	
 
 	PartitionClose(partition);
 	destroyArrayList(registers);
 
+
 }
 
-void PrintPartitions(void)
+static void PrintPartitions(void)
 {
 	FILE* partition = NULL;
 	char bufferStr[64];
@@ -158,7 +183,8 @@ void PrintPartitions(void)
 		sprintf(bufferStr,"Partitions/Partition %u.bin",i);
 		FileOpen(partition, bufferStr, "rb");
 		puts(bufferStr);
-		PrintFile(partition);
+		//PrintFile(partition);
+		PrintTestFile(partition);
 		FileClose(partition);
 	}	
 }
@@ -202,31 +228,31 @@ int main(int argc, char const *argv[])
 
 	BinaryTreeWinners tree;
 	ArrayList partitionList;
+	ArrayList leaves;
 
 
-	unsigned long long sizeReg = sizeof(struct Register);
+	unsigned long long sizeReg = sizeof(struct Client);
 
 	scanf("%i",&nReg);
 	scanf("%i",&mregisters);
-	void* tupl[3] = {&nReg, CreateAleatoryRegister, &sizeReg};
+	void* tupl[3] = {&nReg, CreateAleatoryClient, &sizeReg};
 
 	file = CreateTestFile(&tupl);
+
 	puts("Arquivo Test");
-	PrintFile(file);
+	PrintTestFile(file);
+	
 	
 	SubstitutionSelection(file, mregisters);
 
 	PrintPartitions();
-
 	FileClose(file);
 	
-	tree = newBinaryTreeWinners(4);
-	partitionList = GetListGeneratedPartitions();
-	buildTreeWinners(tree, partitionList, readFile);
-
-	BinaryTreePreOrdem(tree);
-
-
+	
+	//tree = newBinaryTreeWinners(4);
+	//partitionList = GetListGeneratedPartitions();
+	//InterweaveTree(tree, partitionList, readFile);
+	
 
 	return 0;
 }

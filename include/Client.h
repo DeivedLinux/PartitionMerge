@@ -16,13 +16,13 @@ typedef struct Client
 			unsigned day:5;
 			unsigned month:4;
 		}field;
-	}bith;
+	}birth;
 }*Client;
 
 
 Client newClientStack(struct Client client);
 Client newClient(const char* name, unsigned day, unsigned month, unsigned year);
-		
+void CreateAleatoryClient(Client client, int n);		
 
 
 

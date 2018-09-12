@@ -13,6 +13,7 @@
 #include <stdbool.h>
 #include "Typedefs.h"
 
+
 #define CastingUnPtr(List) ((Node)(*(*((unsigned long long***)List))))
 
 #define foreach_ArrayList(Obj, List)  \
@@ -55,5 +56,6 @@ void destroyArrayList(ArrayList list);
 bool fullArrayList(ArrayList list);
 unsigned getListLimit(ArrayList list);
 
+Object* listToVector(ArrayList list);
 
 #endif

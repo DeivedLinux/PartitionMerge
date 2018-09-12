@@ -11,6 +11,7 @@
 
 
 typedef void* Object;
+typedef unsigned char Byte;
 
 
 

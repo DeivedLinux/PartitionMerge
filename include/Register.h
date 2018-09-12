@@ -15,7 +15,7 @@ typedef struct Register
 			unsigned freeze:1;
 		}bit;
 	}rField;
-	void* info;
+	void* attached;
 }*Register;
 
 void PrintFile(FILE* file);
