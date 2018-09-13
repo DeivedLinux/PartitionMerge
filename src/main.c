@@ -23,6 +23,7 @@ static bool allFrozen(ArrayList list);
 static void unfreezeRecords(ArrayList list);
 static void SubstitutionSelection(FILE* file, int mregisters);
 static ArrayList GetListGeneratedPartitions(void);
+static unsigned HIGH_VALUE;
 
 
 static int compare(Object obj1, Object obj2)
@@ -92,7 +93,7 @@ static void PrintTestFile(FILE* file)
 	{
 		puts("**********************************************");
 		printf("Nome: %s\n",client.name);
-		printf("C´odigo Cliente: %u\n", client.clientCode);
+		printf("Código Cliente: %u\n", client.clientCode);
 		printf("Nascimento: %u/%u/%u\n", client.birth.field.day, client.birth.field.month, client.birth.field.year);
 		puts("**********************************************");
 	}
@@ -117,6 +118,7 @@ static void SubstitutionSelection(FILE* file, int mregisters)
 	foreach_mRegisters(client, file, mregisters)
 	{	
 		reg.rField.bit.key = client.clientCode;
+		reg.rField.bit.freeze = false;
 		reg.attached = malloc(sizeof(struct Client));
 		memcpy(reg.attached, &client, sizeof(struct Client));
 		insertSorted(registers, newRegister(reg), compare);
@@ -168,8 +170,6 @@ static void SubstitutionSelection(FILE* file, int mregisters)
 
 	PartitionClose(partition);
 	destroyArrayList(registers);
-
-
 }
 
 static void PrintPartitions(void)
@@ -216,14 +216,29 @@ static unsigned readFile(FILE* file)
 
 	FileRead(&client, sizeof(struct Client), 1, file, res);
 
-	reg.rField.bit.key = client.clientCode;
-
+	if(res > 0)
+		reg.rField.bit.key = client.clientCode;
+	else
+		reg.rField.bit.key = HIGH_VALUE;
+	
 	return reg.rField.bit.key;
+}
+
+static void writeFile(FILE* partitionFile, FILE* outputFile, int index)
+{
+	struct Client client;
+	int res;
+
+	FileSeek(partitionFile, index* sizeof(struct Client), SEEK_CUR);
+	FileRead(&client, sizeof(struct Client), 1, partitionFile, res);
+	FileWrite(&client, sizeof(struct Client),1, outputFile, res);
+
 }
 
 int main(int argc, char const *argv[])
 {
 	FILE* file;
+	FILE* outFile;
 	int nReg,mregisters;
 
 	BinaryTreeWinners tree;
@@ -237,6 +252,8 @@ int main(int argc, char const *argv[])
 	scanf("%i",&mregisters);
 	void* tupl[3] = {&nReg, CreateAleatoryClient, &sizeReg};
 
+	HIGH_VALUE = nReg;
+
 	file = CreateTestFile(&tupl);
 
 	puts("Arquivo Test");
@@ -244,15 +261,16 @@ int main(int argc, char const *argv[])
 	
 	
 	SubstitutionSelection(file, mregisters);
-
 	PrintPartitions();
+	
 	FileClose(file);
 	
 	
-	//tree = newBinaryTreeWinners(4);
-	//partitionList = GetListGeneratedPartitions();
-	//InterweaveTree(tree, partitionList, readFile);
-	
+	tree = newBinaryTreeWinners(4);
+	partitionList = GetListGeneratedPartitions();
+	outFile = InterweaveTree(tree, partitionList, readFile, writeFile ,mregisters);
+	puts("Arquivo ordenado");
+	PrintTestFile(outFile);
 
 	return 0;
 }

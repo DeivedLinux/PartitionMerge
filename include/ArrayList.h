@@ -19,14 +19,6 @@
 #define foreach_ArrayList(Obj, List)  \
 	for(Node scroll = CastingUnPtr(List); scroll != NULL, Obj = scroll != NULL?scroll->data:0; scroll = scroll->next)
 
-#define foreachTwo_ArrayList(Obj1, Obj2, List) 		\
-	for(Node scrollOne = CastingUnPtr(List),		\
-		scrollTwo = scrollOne != NULL?scrollOne->next:0; \
-		scrollOne != NULL && scrollTwo != NULL,		\
-		Obj1 = scrollOne != NULL?scrollOne->data:0,	\
-		Obj2 = scrollTwo != NULL?scrollTwo->data:0; \
-		scrollOne = scrollTwo->next,				\
-		scrollTwo = scrollTwo->next->next)
 
 
 typedef struct Node

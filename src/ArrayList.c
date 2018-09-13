@@ -537,6 +537,7 @@ void destroyArrayList(ArrayList list)
 			{
 				nodeToBeReleased = *GetListHead(list);
 				*GetListHead(list) = (*GetListHead(list))->next;
+				free(nodeToBeReleased->data);
 				free(nodeToBeReleased);
 			}
 			free(GetListHead(list));

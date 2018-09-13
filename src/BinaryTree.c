@@ -34,6 +34,7 @@ typedef struct BTree
 }*BTree;
 
 static void PreOrder(Root root);
+static void PostOrder(Root root, FunctionReadFile readFile);
 
 
 BinaryTreeWinners newBinaryTreeWinners(int treeLeaves)
@@ -108,7 +109,7 @@ static TreeNode newNodeCreate(void)
 	return node;
 } 
 
-void InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile)
+FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile, FunctionWriteFile writeFile, const int HIGH_VALUE)
 {
 	TreeNode *leavesVect;
 	TreeNode newNode;
@@ -119,6 +120,8 @@ void InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFil
 	unsigned nodes = 0;
 	ArrayList leavesList;
 	FILE* outputFile = NULL;
+	FILE* selectPartition;
+	int res;
 
 	nFiles = getListLimit(listFiles);
 	leavesVect = (TreeNode*)calloc(nFiles, sizeof(TreeNode));
@@ -182,6 +185,16 @@ void InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFil
 					*TreeRoot(tree) = leavesVect[0];
 				}
 			}
+			free(leavesVect);
+
+			selectPartition = (*TreeRoot(tree))->file;
+			ReWind(selectPartition);
+			writeFile(selectPartition, outputFile, 0);
+
+			leavesVect = (TreeNode*)listToVector(leavesList);
+			PostOrder(TreeRoot(tree), readFile);
+			printf("%i\n",(*TreeRoot(tree))->winner);
+			//FileWrite()
 
 			
 		}
@@ -195,7 +208,9 @@ void InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFil
 		PrintExceptionStdOut(NullPointerException);
 	}
 
-	free(leavesVect);
+	
+
+	return outputFile;
 }
 
 static void PreOrder(Root root)
@@ -208,11 +223,36 @@ static void PreOrder(Root root)
 	}
 }
 
+static void PostOrder(Root root, FunctionReadFile readFile)
+{
+	if(*root != NULL)
+	{
+		PostOrder(&((*root)->leftSon), readFile);
+		PostOrder(&((*root)->rightSon), readFile);
+		if((*root)->leftSon == NULL && (*root)->rightSon == NULL)
+		{
+			(*root)->winner = readFile((*root)->file);
+		}
+		else if((*root)->leftSon->winner < (*root)->rightSon->winner)
+		{
+			(*root)->winner = (*root)->leftSon->winner;
+		}
+		else
+		{
+			(*root)->winner = (*root)->rightSon->winner;	
+		}
+
+	}
+}
+
 void BinaryTreePreOrder(BinaryTreeWinners tree)
 {
 	PreOrder(TreeRoot(tree));
 }
 
-
+void BinaryTreePostOrder(BinaryTreeWinners tree)
+{
+	//PostOrder(TreeRoot(tree));
+}
 
 

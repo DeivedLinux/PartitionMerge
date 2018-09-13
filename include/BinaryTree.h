@@ -2,7 +2,7 @@
 	Author: Deived William da silva Azevedo
 	Date: 04/09/2018
 	File: BinaryTree
-	Dependencies: stdlib.h, stdbool.h
+	Dependencies: stdlib.h, stdbool.h, ArrayList.h
 */
 
 
@@ -14,12 +14,13 @@
 
 typedef void* BinaryTreeWinners;
 typedef unsigned(*FunctionReadFile)(FILE* file);
+typedef void(*FunctionWriteFile)(FILE* partition, FILE* outputFile, int index);
 
 
 BinaryTreeWinners newBinaryTreeWinners(int treeLeaves);
-void InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile);
+FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile, FunctionWriteFile writeFile, const int HIGH_VALUE);
 void BinaryTreePreOrder(BinaryTreeWinners tree);
-
+void BinaryTreePostOrder(BinaryTreeWinners tree);
 
 
 
