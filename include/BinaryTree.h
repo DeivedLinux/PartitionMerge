@@ -14,7 +14,7 @@
 
 typedef void* BinaryTreeWinners;
 typedef unsigned(*FunctionReadFile)(FILE* file);
-typedef void(*FunctionWriteFile)(FILE* partition, FILE* outputFile, int index);
+typedef void(*FunctionWriteFile)(FILE* partition, FILE* outputFile);
 
 
 BinaryTreeWinners newBinaryTreeWinners(int treeLeaves);

@@ -224,12 +224,12 @@ static unsigned readFile(FILE* file)
 	return reg.rField.bit.key;
 }
 
-static void writeFile(FILE* partitionFile, FILE* outputFile, int index)
+static void writeFile(FILE* partitionFile, FILE* outputFile)
 {
 	struct Client client;
 	int res;
 
-	FileSeek(partitionFile, index* sizeof(struct Client), SEEK_CUR);
+	FileSeek(partitionFile,-sizeof(struct Client), SEEK_CUR);
 	FileRead(&client, sizeof(struct Client), 1, partitionFile, res);
 	FileWrite(&client, sizeof(struct Client),1, outputFile, res);
 
@@ -262,15 +262,15 @@ int main(int argc, char const *argv[])
 	
 	SubstitutionSelection(file, mregisters);
 	PrintPartitions();
-	
-	FileClose(file);
-	
-	
+
 	tree = newBinaryTreeWinners(4);
 	partitionList = GetListGeneratedPartitions();
-	outFile = InterweaveTree(tree, partitionList, readFile, writeFile ,mregisters);
+	outFile = InterweaveTree(tree, partitionList, readFile, writeFile, HIGH_VALUE);
 	puts("Arquivo ordenado");
 	PrintTestFile(outFile);
+
+	FileClose(file);
+	FileClose(outFile);
 
 	return 0;
 }

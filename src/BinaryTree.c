@@ -7,13 +7,14 @@
 
 #define TreeRoot(Tree)   (((BTree)(Tree))->root)
 #define TreeLeaves(Tree) (((BTree)(Tree))->limit)
+#define None -1
 
 typedef struct TreeNode
 {
 	struct TreeNode* father;
 	struct TreeNode* leftSon;
 	struct TreeNode* rightSon;
-	FILE* file;
+	int addressWinner;
 	unsigned winner;
 }*TreeNode;
 
@@ -34,7 +35,8 @@ typedef struct BTree
 }*BTree;
 
 static void PreOrder(Root root);
-static void PostOrder(Root root, FunctionReadFile readFile);
+static void PostOrder(Root root);
+static void Cppa(Root root);
 
 
 BinaryTreeWinners newBinaryTreeWinners(int treeLeaves)
@@ -93,7 +95,7 @@ static TreeNode newNodeCreate(void)
 			node->father = NULL;
 			node->leftSon = NULL;
 			node->rightSon = NULL;
-			node->file = NULL;
+			node->addressWinner = None;
 			node->winner = 0;
 		}
 		else
@@ -109,22 +111,46 @@ static TreeNode newNodeCreate(void)
 	return node;
 } 
 
+static void CompareUntilRoot(Root root)
+{
+	if(*root != NULL)
+	{
+		CompareUntilRoot(&((*root)->father));
+
+		if((*root)->leftSon != NULL && (*root)->rightSon != NULL)
+		{	
+		 	if((*root)->leftSon->winner < (*root)->rightSon->winner)
+			{	
+				(*root)->winner = (*root)->leftSon->winner;
+				(*root)->addressWinner = (*root)->leftSon->addressWinner;
+			}
+			else
+			{
+				(*root)->winner = (*root)->rightSon->winner;
+				(*root)->addressWinner = (*root)->rightSon->addressWinner;	
+			}
+		}
+	}
+}
+
 FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile, FunctionWriteFile writeFile, const int HIGH_VALUE)
 {
 	TreeNode *leavesVect;
 	TreeNode newNode;
-	FILE* partition;
-	Node auxiliary;
 	unsigned k,i;
 	unsigned nFiles;
 	unsigned nodes = 0;
 	ArrayList leavesList;
 	FILE* outputFile = NULL;
 	FILE* selectPartition;
+	FILE* partition;
+	FILE** filesVect;
 	int res;
 
 	nFiles = getListLimit(listFiles);
 	leavesVect = (TreeNode*)calloc(nFiles, sizeof(TreeNode));
+	filesVect = (FILE**)calloc(nFiles, sizeof(FILE*));
+
 	leavesList = newArrayList(nFiles);
 	FileOpen(outputFile, "OutputFile/output.bin", "w+b");
 
@@ -138,7 +164,8 @@ FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFi
 				
 				k = readFile(partition);
 				newNode = newNodeCreate();
-				newNode->file = partition;
+				newNode->addressWinner = nodes;
+				filesVect[nodes] = partition;
 				newNode->winner = k;
 				leavesVect[nodes] = newNode;
 				insertBottomList(leavesList, newNode);
@@ -153,7 +180,7 @@ FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFi
 					newNode = newNodeCreate();
 					if(leavesVect[i]->winner < leavesVect[i + 1]->winner)
 					{
-						newNode->file = leavesVect[i]->file;
+						newNode->addressWinner = leavesVect[i]->addressWinner;
 						newNode->winner = leavesVect[i]->winner;
 						newNode->leftSon = leavesVect[i];
 						newNode->rightSon = leavesVect[i + 1];
@@ -162,7 +189,7 @@ FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFi
 					}
 					else
 					{
-						newNode->file = leavesVect[i + 1]->file;
+						newNode->addressWinner = leavesVect[i + 1]->addressWinner;
 						newNode->winner = leavesVect[i + 1]->winner;
 						newNode->leftSon = leavesVect[i];
 						newNode->rightSon = leavesVect[i + 1];
@@ -183,20 +210,20 @@ FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFi
 				if(nFiles == 1)
 				{	
 					*TreeRoot(tree) = leavesVect[0];
+					(*TreeRoot(tree))->father = NULL;
 				}
 			}
 			free(leavesVect);
 
-			selectPartition = (*TreeRoot(tree))->file;
-			ReWind(selectPartition);
-			writeFile(selectPartition, outputFile, 0);
-
 			leavesVect = (TreeNode*)listToVector(leavesList);
-			PostOrder(TreeRoot(tree), readFile);
-			printf("%i\n",(*TreeRoot(tree))->winner);
-			//FileWrite()
-
 			
+			while((*TreeRoot(tree))->winner != HIGH_VALUE)
+			{
+				selectPartition = filesVect[(*TreeRoot(tree))->addressWinner];
+			 	writeFile(selectPartition, outputFile);
+			 	leavesVect[(*TreeRoot(tree))->addressWinner]->winner = readFile(selectPartition);
+			 	CompareUntilRoot(&leavesVect[(*TreeRoot(tree))->addressWinner]);
+			}
 		}
 		else
 		{
@@ -208,6 +235,12 @@ FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFi
 		PrintExceptionStdOut(NullPointerException);
 	}
 
+	foreach_ArrayList(partition, listFiles)
+	{
+		FileClose(partition);
+	}
+	destroyArrayList(leavesList);
+	free(filesVect);
 	
 
 	return outputFile;
@@ -223,25 +256,13 @@ static void PreOrder(Root root)
 	}
 }
 
-static void PostOrder(Root root, FunctionReadFile readFile)
+
+static void PostOrder(Root root)
 {
 	if(*root != NULL)
 	{
-		PostOrder(&((*root)->leftSon), readFile);
-		PostOrder(&((*root)->rightSon), readFile);
-		if((*root)->leftSon == NULL && (*root)->rightSon == NULL)
-		{
-			(*root)->winner = readFile((*root)->file);
-		}
-		else if((*root)->leftSon->winner < (*root)->rightSon->winner)
-		{
-			(*root)->winner = (*root)->leftSon->winner;
-		}
-		else
-		{
-			(*root)->winner = (*root)->rightSon->winner;	
-		}
-
+		PostOrder(&((*root)->leftSon));
+		PostOrder(&((*root)->rightSon));
 	}
 }
 
@@ -250,9 +271,10 @@ void BinaryTreePreOrder(BinaryTreeWinners tree)
 	PreOrder(TreeRoot(tree));
 }
 
+
 void BinaryTreePostOrder(BinaryTreeWinners tree)
 {
-	//PostOrder(TreeRoot(tree));
+	PostOrder(TreeRoot(tree));
 }
 
 

@@ -23,6 +23,7 @@ void CreateAleatoryRegister(Register outRegister, int n)
 	struct Register res;
 
 	res.rField.bit.key = rand()%n;
+	printf("aaa%i\n",n );
 	res.rField.bit.freeze = false;
 	*outRegister = res;
 }
