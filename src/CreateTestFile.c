@@ -15,7 +15,6 @@ FILE* CreateTestFile(void* tupl)
 	unsigned i;
 	int n;
 	void(*func)(Object, int);
-	void(*format)(Object);
 	unsigned offset;
 	volatile int res;
 	void* blockMemory;

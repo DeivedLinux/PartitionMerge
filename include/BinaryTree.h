@@ -17,7 +17,7 @@ typedef unsigned(*FunctionReadFile)(FILE* file);
 typedef void(*FunctionWriteFile)(FILE* partition, FILE* outputFile);
 
 
-BinaryTreeWinners newBinaryTreeWinners(int treeLeaves);
+BinaryTreeWinners newBinaryTreeWinners(void);
 FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile, FunctionWriteFile writeFile, const int HIGH_VALUE);
 void BinaryTreePreOrder(BinaryTreeWinners tree);
 void BinaryTreePostOrder(BinaryTreeWinners tree);

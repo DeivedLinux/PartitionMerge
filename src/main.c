@@ -229,7 +229,6 @@ static void writeFile(FILE* partitionFile, FILE* outputFile)
 {
 	struct Client client;
 	int res;
-	int temp;
 
 	FileSeek(partitionFile,-sizeof(struct Client), SEEK_CUR);
 	FileRead(&client, sizeof(struct Client), 1, partitionFile, res);
@@ -249,12 +248,12 @@ int main(int argc, char const *argv[])
 
 	BinaryTreeWinners tree;
 	ArrayList partitionList;
-	ArrayList leaves;
-
 
 	unsigned long long sizeReg = sizeof(struct Client);
 
+	puts("Digite a quantidade de Registros para teste");
 	scanf("%i",&nReg);
+	puts("Quantidade de registros simultâneo na memória");
 	scanf("%i",&mregisters);
 	void* tupl[3] = {&nReg, CreateAleatoryClient, &sizeReg};
 
@@ -269,7 +268,7 @@ int main(int argc, char const *argv[])
 	SubstitutionSelection(file, mregisters);
 	PrintPartitions();
 
-	tree = newBinaryTreeWinners(4);
+	tree = newBinaryTreeWinners();
 	partitionList = GetListGeneratedPartitions();
 	outFile = InterweaveTree(tree, partitionList, readFile, writeFile, HIGH_VALUE);
 	puts("\t\tArquivo ordenado\n\n");

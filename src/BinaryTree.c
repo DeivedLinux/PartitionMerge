@@ -1,9 +1,9 @@
 #include "../include/BinaryTree.h"
 #include "../include/Typedefs.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include "../include/ArrayList.h"
 #include "../include/Exception.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #define TreeRoot(Tree)   (((BTree)(Tree))->root)
 #define TreeLeaves(Tree) (((BTree)(Tree))->limit)
@@ -20,25 +20,18 @@ typedef struct TreeNode
 
 typedef TreeNode* Root;
 
-typedef enum
-{
-	LIMITED,
-	UNLIMITED
-}ListProperty;
 
 typedef struct BTree
 {
 	Root root;
 	unsigned size;
-	unsigned limit;
-	ListProperty property;
 }*BTree;
 
 static void PreOrder(Root root);
 static void PostOrder(Root root);
 
 
-BinaryTreeWinners newBinaryTreeWinners(int treeLeaves)
+BinaryTreeWinners newBinaryTreeWinners(void)
 {
 	BTree newTree = NULL;
 
@@ -51,17 +44,7 @@ BinaryTreeWinners newBinaryTreeWinners(int treeLeaves)
 			if(newTree->root != NULL)
 			{
 				*newTree->root = NULL;
-				if(treeLeaves < 0)
-				{
-					newTree->property = UNLIMITED;
-					newTree->size = 0;
-				}
-				else
-				{
-					newTree->property = LIMITED;
-					newTree->limit = treeLeaves;
-					newTree->size = 0;
-				}
+				newTree->size = 0;
 			}
 			else
 			{
