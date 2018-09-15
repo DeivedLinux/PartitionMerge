@@ -36,7 +36,6 @@ typedef struct BTree
 
 static void PreOrder(Root root);
 static void PostOrder(Root root);
-static void Cppa(Root root);
 
 
 BinaryTreeWinners newBinaryTreeWinners(int treeLeaves)
@@ -110,28 +109,6 @@ static TreeNode newNodeCreate(void)
 
 	return node;
 } 
-
-static void CompareUntilRoot(Root root)
-{
-	if(*root != NULL)
-	{
-		CompareUntilRoot(&((*root)->father));
-
-		if((*root)->leftSon != NULL && (*root)->rightSon != NULL)
-		{	
-		 	if((*root)->leftSon->winner < (*root)->rightSon->winner)
-			{	
-				(*root)->winner = (*root)->leftSon->winner;
-				(*root)->addressWinner = (*root)->leftSon->addressWinner;
-			}
-			else
-			{
-				(*root)->winner = (*root)->rightSon->winner;
-				(*root)->addressWinner = (*root)->rightSon->addressWinner;	
-			}
-		}
-	}
-}
 
 FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile, FunctionWriteFile writeFile, const int HIGH_VALUE)
 {
@@ -216,14 +193,15 @@ FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFi
 			free(leavesVect);
 
 			leavesVect = (TreeNode*)listToVector(leavesList);
-			
+
 			while((*TreeRoot(tree))->winner != HIGH_VALUE)
 			{
 				selectPartition = filesVect[(*TreeRoot(tree))->addressWinner];
 			 	writeFile(selectPartition, outputFile);
 			 	leavesVect[(*TreeRoot(tree))->addressWinner]->winner = readFile(selectPartition);
-			 	CompareUntilRoot(&leavesVect[(*TreeRoot(tree))->addressWinner]);
+			 	PostOrder(TreeRoot(tree));
 			}
+
 		}
 		else
 		{
@@ -263,6 +241,20 @@ static void PostOrder(Root root)
 	{
 		PostOrder(&((*root)->leftSon));
 		PostOrder(&((*root)->rightSon));
+
+		if((*root)->leftSon != NULL && (*root)->rightSon != NULL)
+		{
+			if((*root)->leftSon->winner < (*root)->rightSon->winner)
+			{
+				(*root)->winner = (*root)->leftSon->winner;
+				(*root)->addressWinner = (*root)->leftSon->addressWinner;
+			}
+			else
+			{
+				(*root)->winner = (*root)->rightSon->winner;
+				(*root)->addressWinner = (*root)->rightSon->addressWinner;
+			}
+		}
 	}
 }
 

@@ -96,6 +96,7 @@ static void PrintTestFile(FILE* file)
 		printf("Código Cliente: %u\n", client.clientCode);
 		printf("Nascimento: %u/%u/%u\n", client.birth.field.day, client.birth.field.month, client.birth.field.year);
 		puts("**********************************************");
+		puts(" ");
 	}
 }
 
@@ -212,7 +213,7 @@ static unsigned readFile(FILE* file)
 {
 	struct Client client;
 	struct Register reg;
-	unsigned res;
+	int res;
 
 	FileRead(&client, sizeof(struct Client), 1, file, res);
 
@@ -228,10 +229,15 @@ static void writeFile(FILE* partitionFile, FILE* outputFile)
 {
 	struct Client client;
 	int res;
+	int temp;
 
 	FileSeek(partitionFile,-sizeof(struct Client), SEEK_CUR);
 	FileRead(&client, sizeof(struct Client), 1, partitionFile, res);
-	FileWrite(&client, sizeof(struct Client),1, outputFile, res);
+	
+	if(res > 0)
+	{
+		FileWrite(&client, sizeof(struct Client),1, outputFile, res);
+	}
 
 }
 
@@ -266,7 +272,7 @@ int main(int argc, char const *argv[])
 	tree = newBinaryTreeWinners(4);
 	partitionList = GetListGeneratedPartitions();
 	outFile = InterweaveTree(tree, partitionList, readFile, writeFile, HIGH_VALUE);
-	puts("Arquivo ordenado");
+	puts("\t\tArquivo ordenado\n\n");
 	PrintTestFile(outFile);
 
 	FileClose(file);

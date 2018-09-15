@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "../include/Exception.h"
 #include "../include/Register.h"
 #include "../include/Client.h"
@@ -21,7 +22,7 @@ FILE* CreateTestFile(void* tupl)
 
 	FileOpen(newTestFile, "TestFile.bin", "w+b");
 
-
+	srand(time(NULL));
 	n = *((int*)(((void**)tupl)[0]));
 	func = ((void(*)(Object,int))(((void**)tupl)[1]));
 	offset = *((unsigned long*)(((void**)tupl)[2]));
