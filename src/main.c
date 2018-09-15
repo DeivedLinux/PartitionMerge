@@ -9,7 +9,8 @@
 #include "../include/BinaryTree.h"
 #include "../include/Client.h"
 
-#define MAX_REGISTERS 1000UL	
+#define MAX_REGISTERS 1000UL
+
 
 
 extern FILE* PartitionCreate(void);

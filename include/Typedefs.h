@@ -10,9 +10,9 @@
 #define TYPEDEFS_H_ 
 
 
+
 typedef void* Object;
 typedef unsigned char Byte;
-
 
 
 #endif
