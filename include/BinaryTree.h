@@ -16,9 +16,14 @@ typedef void* BinaryTreeWinners;
 typedef unsigned(*FunctionReadFile)(FILE* file);
 typedef void(*FunctionWriteFile)(FILE* partition, FILE* outputFile);
 
+typedef enum
+{
+	OUT_FILETEMP,
+	OUT_FILESTD
+}OUTPUT;
 
 BinaryTreeWinners newBinaryTreeWinners(void);
-FILE* InterweaveTree(BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile, FunctionWriteFile writeFile, const int HIGH_VALUE);
+FILE* InterweaveTree(const OUTPUT outmode, BinaryTreeWinners tree, ArrayList listFiles, FunctionReadFile readFile, FunctionWriteFile writeFile, const int HIGH_VALUE);
 void BinaryTreePreOrder(BinaryTreeWinners tree);
 void BinaryTreePostOrder(BinaryTreeWinners tree);
 

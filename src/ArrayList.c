@@ -509,10 +509,10 @@ void destroyList(ArrayList list)
 				*GetListHead(list) = (*GetListHead(list))->next;
 				free(nodeToBeReleased);
 			}
-			free(nodeToBeReleased);
 
 			*GetListHead(list) = NULL;
 			*GetListEnd(list) = NULL;
+			CList(list)->size = 0;
 		}
 		else 
 		{
@@ -572,6 +572,7 @@ unsigned getListSize(ArrayList list)
 		PrintExceptionStdOut(NullPointerException);
 	}
 	
+	return 0;
 }
 
 unsigned getListLimit(ArrayList list)
@@ -591,6 +592,8 @@ unsigned getListLimit(ArrayList list)
 	{
 		PrintExceptionStdOut(NullPointerException);
 	}
+
+	return 0;
 }
 
 void printList(ArrayList list, PrintFunctionFormat format)

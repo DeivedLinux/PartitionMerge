@@ -23,7 +23,9 @@
 #define finally else
 
 
-#define PrintExceptionStdOut(Obj) printf("File: %s Funçao: %s %d %s, Exception Code: %lu\n",__FILE__, __FUNCTION__, __LINE__, Obj.message, Obj.code)
+#define PrintExceptionStdOut(Obj) \
+	printf("File: %s Funçao: %s %d %s, Exception Code: %lu\n",__FILE__, __FUNCTION__, __LINE__, Obj.message, Obj.code); \
+	if(Obj.code == __NullPointerException__ || Obj.code == __TreeWinnerException__) exit(0);
 
 
 
@@ -232,7 +234,8 @@ extern enum ObjExceptionType
 	__ListRemoveException__,
 	__ListInsertTopException__,
 	__ListInsertBottomException__,
-	__ListInsertException__
+	__ListInsertException__,
+	__TreeWinnerException__
 }ExceptionType;
 
 
@@ -254,5 +257,6 @@ extern struct ObjException ListRemoveException;
 extern struct ObjException ListInsertTopException;
 extern struct ObjException ListInsertBottomException;
 extern struct ObjException ListInsertException;
+extern struct ObjException TreeWinnerException;
 
 #endif

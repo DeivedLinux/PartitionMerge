@@ -246,9 +246,15 @@ int main(int argc, char const *argv[])
 	FILE* file;
 	FILE* outFile;
 	int nReg,mregisters;
-
+	int simultaneousFile;
+	unsigned i;
 	BinaryTreeWinners tree;
 	ArrayList partitionList;
+	ArrayList list;
+	FILE** fileVect;
+	int generatedPartitions;
+	int filesRemaining;
+	int index = 0;
 
 	unsigned long long sizeReg = sizeof(struct Client);
 
@@ -256,6 +262,9 @@ int main(int argc, char const *argv[])
 	scanf("%i",&nReg);
 	puts("Quantidade de registros simultâneo na memória");
 	scanf("%i",&mregisters);
+	puts("Arquivos abertos Simultâneamente");
+	scanf("%i", &simultaneousFile);
+
 	void* tupl[3] = {&nReg, CreateAleatoryClient, &sizeReg};
 
 	HIGH_VALUE = nReg;
@@ -271,7 +280,50 @@ int main(int argc, char const *argv[])
 
 	tree = newBinaryTreeWinners();
 	partitionList = GetListGeneratedPartitions();
-	outFile = InterweaveTree(tree, partitionList, readFile, writeFile, HIGH_VALUE);
+	generatedPartitions = getListSize(partitionList);
+
+
+	if(generatedPartitions > (simultaneousFile-1))
+	{
+		filesRemaining = generatedPartitions;
+		list = newArrayList(generatedPartitions);
+
+		puts("Número de partições geradas maior do que máximo valor de arquivos abertos");
+		while(generatedPartitions > 0)
+		{
+
+
+			for(i = 0; i < simultaneousFile-1+index; i++)
+			{
+				Object obj;
+
+				if(!isEmpty(partitionList))
+				{
+					obj = removeTopList(partitionList);
+					insertTopList(list,obj);
+				}
+			}
+			index += (simultaneousFile-1);
+			generatedPartitions -= simultaneousFile;
+
+			if(simultaneousFile == 0)
+			{
+
+				outFile = InterweaveTree(OUT_FILESTD, tree, list, readFile,writeFile, HIGH_VALUE);
+
+			}
+			else
+			{
+				outFile = InterweaveTree(OUT_FILETEMP, tree, list, readFile,writeFile, HIGH_VALUE);
+				destroyList(list);
+				insertTopList(list, outFile);
+			}
+		}
+	}
+	else
+	{
+		outFile = InterweaveTree(OUT_FILESTD,tree, partitionList, readFile, writeFile, HIGH_VALUE);
+	}
 	puts("\t\tArquivo ordenado\n\n");
 	PrintTestFile(outFile);
 
