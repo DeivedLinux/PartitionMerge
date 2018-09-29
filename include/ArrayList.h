@@ -19,7 +19,7 @@
 #define foreach_ArrayList(Obj, List)  \
 	for(Node scroll = CastingUnPtr(List); scroll != NULL, Obj = scroll != NULL?scroll->data:0; scroll = scroll->next)
 
-
+#define not !
 
 typedef struct Node
 {

@@ -251,11 +251,10 @@ int main(int argc, char const *argv[])
 	BinaryTreeWinners tree;
 	ArrayList partitionList;
 	ArrayList list;
-	FILE** fileVect;
 	int generatedPartitions;
-	int filesRemaining;
+	int temp;
 	int index = 0;
-
+	bool isEnd = false;
 	unsigned long long sizeReg = sizeof(struct Client);
 
 	puts("Digite a quantidade de Registros para teste");
@@ -285,45 +284,56 @@ int main(int argc, char const *argv[])
 
 	if(generatedPartitions > (simultaneousFile-1))
 	{
-		filesRemaining = generatedPartitions;
 		list = newArrayList(generatedPartitions);
+		temp = getListSize(partitionList);
 
-		puts("Número de partições geradas maior do que máximo valor de arquivos abertos");
-		while(generatedPartitions > 0)
+		puts("Número de partições geradas \
+maior do que máximo valor de arquivos abertos. \
+Intecalaç~ao ´otima est´a sendo usado.");
+
+		while(generatedPartitions >= 0)
 		{
-
-
-			for(i = 0; i < simultaneousFile-1+index; i++)
+			for(i = 0; i < (simultaneousFile-1); i++)
 			{
 				Object obj;
 
-				if(!isEmpty(partitionList))
+				if(not isEmpty(partitionList))
 				{
 					obj = removeTopList(partitionList);
-					insertTopList(list,obj);
+					insertBottomList(list,obj);
+				}
+				else
+				{
+					break;
 				}
 			}
-			index += (simultaneousFile-1);
-			generatedPartitions -= simultaneousFile;
+		
+			generatedPartitions -= (simultaneousFile-1);
 
-			if(simultaneousFile == 0)
+			if(temp > 1)
 			{
-
-				outFile = InterweaveTree(OUT_FILESTD, tree, list, readFile,writeFile, HIGH_VALUE);
-
-			}
-			else
-			{
-				outFile = InterweaveTree(OUT_FILETEMP, tree, list, readFile,writeFile, HIGH_VALUE);
+				if(getListSize(list) >= (simultaneousFile-1))
+				{
+					outFile = InterweaveTree(OUT_FILETEMP, tree, list, readFile,writeFile, HIGH_VALUE);
+				}
+				else
+				{
+					outFile = InterweaveTree(OUT_FILESTD, tree, list, readFile,writeFile, HIGH_VALUE);
+				}
 				destroyList(list);
-				insertTopList(list, outFile);
+				ReWind(outFile);
+				insertBottomList(partitionList, outFile);
+				temp = getListSize(partitionList);
 			}
+
 		}
 	}
 	else
 	{
 		outFile = InterweaveTree(OUT_FILESTD,tree, partitionList, readFile, writeFile, HIGH_VALUE);
 	}
+
+
 	puts("\t\tArquivo ordenado\n\n");
 	PrintTestFile(outFile);
 

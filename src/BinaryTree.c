@@ -165,13 +165,7 @@ FILE* InterweaveTree(const OUTPUT outmode, BinaryTreeWinners tree, ArrayList lis
 			}
 			else
 			{
-				static unsigned temp;
-				char bufferStr[64];
-
-				sprintf(bufferStr,"TempFiles/Temp %u.bin", temp);
-
-				FileOpen(outputFile, bufferStr, "w+b");
-				temp += 1;
+				outputFile = tmpfile();
 			}
 
 			foreach_ArrayList(partition, listFiles)
